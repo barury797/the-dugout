@@ -17,7 +17,7 @@ export default function Home() {
               src="https://discord.com/widget?id=1330080534667333653&theme=dark"
               width="100%"
               height="500"
-              allowTransparency="true"
+              allowtransparency="true"
               sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
             />
           </div>
