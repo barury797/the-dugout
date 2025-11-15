@@ -1,17 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { hasEnvVars } from "./utils";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
-
-  // If the env vars are not set, skip middleware check. You can remove this
-  // once you setup the project.
-  if (!hasEnvVars) {
-    return supabaseResponse;
-  }
 
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
@@ -47,6 +40,25 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  // Public POST endpoints that don't require authentication
+  const publicPostEndpoints: string[] = [
+    // '/api/webhooks/stripe',
+    // '/api/contact',
+  ];
+
+  // Block POST requests for unauthenticated users (except public endpoints)
+  if (
+    request.method === "POST" &&
+    !user &&
+    !publicPostEndpoints.some((path) => request.nextUrl.pathname.startsWith(path))
+  ) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 }
+    );
+  }
+
+  // Redirect unauthenticated users trying to access protected pages
   if (
     request.nextUrl.pathname !== "/" &&
     !user &&
