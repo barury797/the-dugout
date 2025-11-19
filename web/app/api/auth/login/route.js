@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabaseServer';
 
 export async function POST(request) {
   try {
+    console.log('Login attempt');
     const { email, password } = await request.json();
 
     if (!email || !password) {
@@ -19,6 +20,7 @@ export async function POST(request) {
     });
 
     if (error) {
+      console.error('Login error:', error);
       return Response.json(
         { error: error.message || 'Invalid credentials' },
         { status: 401 }
